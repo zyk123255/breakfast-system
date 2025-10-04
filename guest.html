@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>朴树居 早餐点餐</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: "Microsoft YaHei", sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
+header { background: #3a7f4d; color: white; padding: 10px; text-align: center; font-size: 20px; }
+.container { max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+label { display: block; margin-top: 10px; }
+input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+
+.menu-item { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
+.menu-name { flex: 1; }
+.counter { display: flex; align-items: center; gap: 5px; }
+.counter button {
+  background: #3a7f4d;
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.counter button:hover { background: #326e42; }
+.counter span {
+  min-width: 50px;
+  text-align: center;
+  font-size: 16px;
+}
+
+button.submit {
+  background: #3a7f4d; color: white; border: none; padding: 10px 15px;
+  border-radius: 5px; cursor: pointer; margin-top: 15px; width: 100%; font-size: 16px;
+}
+button.submit:hover { background: #326e42; }
+</style>
+</head>
+<body>
+<header>朴树居 早餐点餐</header>
+<div class="container">
+  <label>房间号：</label>
+  <select id="roomNumber">
+    <option value="">请选择房间号</option>
+    <option value="201">201</option>
+    <option value="202">202</option>
+    <option value="301">301</option>
+    <option value="302">302</option>
+    <option value="303">303</option>
+    <option value="305">305</option>
+    <option value="401">401</option>
+    <option value="402">402</option>
+    <option value="403">403</option>
+  </select>
+
+  <label>人数：</label>
+  <select id="guestCount">
+    <option value="1">1 人</option>
+    <option value="2">2 人</option>
+    <option value="3">3 人</option>
+    <option value="4">4 人</option>
+    <option value="5">5 人</option>
+  </select>
+
+  <label>就餐日期：</label>
+  <select id="breakfastDate">
+    <option value="">请选择日期</option>
+  </select>
+
+  <label>预计就餐时间：</label>
+  <select id="breakfastTime">
+    <option value="">请选择时间段</option>
+    <option value="07:00–07:30">07:00–07:30</option>
+    <option value="07:30–08:00">07:30–08:00</option>
+    <option value="08:00–08:30">08:00–08:30</option>
+    <option value="08:30–09:00">08:30–09:00</option>
+    <option value="09:00–09:30">09:00–09:30</option>
+    <option value="09:30–10:00">09:30–10:00</option>
+  </select>
+
+  <h3>选择早餐</h3>
+  <div id="menu">
+    <div class="menu-item" data-item="肉包" data-unit="个">
+      <div class="menu-name">肉包</div>
+      <div class="counter">
+        <button class="minus">−</button>
+        <span class="qty">0 个</span>
+        <button class="plus">＋</button>
+      </div>
+    </div>
+    <div class="menu-item" data-item="菜包" data-unit="个">
+      <div class="menu-name">菜包</div>
+      <div class="counter">
+        <button class="minus">−</button>
+        <span class="qty">0 个</span>
+        <button class="plus">＋</button>
+      </div>
+    </div>
+    <div class="menu-item" data-item="鸡蛋" data-unit="个">
+      <div class="menu-name">鸡蛋</div>
+      <div class="counter">
+        <button class="minus">−</button>
+        <span class="qty">0 个</span>
+        <button class="plus">＋</button>
+      </div>
+    </div>
+    <div class="menu-item" data-item="油条" data-unit="个">
+      <div class="menu-name">油条</div>
+      <div class="counter">
+        <button class="minus">−</button>
+        <span class="qty">0 个</span>
+        <button class="plus">＋</button>
+      </div>
+    </div>
+    <div class="menu-item" data-item="豆浆" data-unit="杯">
+      <div class="menu-name">豆浆</div>
+      <div class="counter">
+        <button class="minus">−</button>
+        <span class="qty">0 杯</span>
+        <button class="plus">＋</button>
+      </div>
+    </div>
+  </div>
+
+  <label>其他想吃的：</label>
+  <input type="text" id="otherFood" placeholder="例如：小米粥、馒头..." />
+
+  <button class="submit" onclick="submitOrder()">提交点餐</button>
+</div>
+
+<script>
+// 页面加载生成今天和明天具体日期
+window.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('breakfastDate');
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  const formatDate = d => d.toISOString().slice(0,10);
+
+  const optionToday = document.createElement('option');
+  optionToday.value = formatDate(today);
+  optionToday.textContent = formatDate(today);
+
+  const optionTomorrow = document.createElement('option');
+  optionTomorrow.value = formatDate(tomorrow);
+  optionTomorrow.textContent = formatDate(tomorrow);
+
+  select.appendChild(optionToday);
+  select.appendChild(optionTomorrow);
+});
+
+// 加减按钮功能
+document.querySelectorAll('.menu-item').forEach(item => {
+  const minusBtn = item.querySelector('.minus');
+  const plusBtn = item.querySelector('.plus');
+  const qtySpan = item.querySelector('.qty');
+  const unit = item.dataset.unit;
+  let qty = 0;
+  minusBtn.addEventListener('click', ()=>{ if(qty>0) qty--; qtySpan.textContent=`${qty} ${unit}`; });
+  plusBtn.addEventListener('click', ()=>{ qty++; qtySpan.textContent=`${qty} ${unit}`; });
+});
+
+function submitOrder() {
+  const room = document.getElementById('roomNumber').value;
+  const count = document.getElementById('guestCount').value;
+  const selectedDate = document.getElementById('breakfastDate').value;
+  const time = document.getElementById('breakfastTime').value;
+
+  if(!room || !time || !selectedDate){ alert('请填写房间号、就餐日期和就餐时间段'); return; }
+
+  const items=[];
+  document.querySelectorAll('.menu-item').forEach(item=>{
+    const name=item.dataset.item;
+    const unit=item.dataset.unit;
+    const qty=parseInt(item.querySelector('.qty').textContent);
+    if(qty>0) items.push({name,qty,unit});
+  });
+
+  const other=document.getElementById('otherFood').value.trim();
+  if(other) items.push({name:other,qty:1,unit:''});
+
+  const details=items.map(it=>`${it.name}×${it.qty}${it.unit}`).join('，');
+  const order={room,count,time,items,details,date:selectedDate};
+
+  let data=JSON.parse(localStorage.getItem('orders')||'[]');
+  const existingIndex=data.findIndex(o=>o.room===room && o.date===selectedDate);
+  if(existingIndex!==-1) data[existingIndex]=order;
+  else data.push(order);
+  localStorage.setItem('orders',JSON.stringify(data));
+  alert('✅ 点餐已提交！');
+  location.reload();
+}
+</script>
+</body>
+</html>
